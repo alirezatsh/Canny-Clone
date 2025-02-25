@@ -1,4 +1,4 @@
-const swaggerAutogen = require('swagger-autogen')(); 
+const swaggerAutogen = require('swagger-autogen')();
 const path = require('path');
 
 const doc = {
@@ -6,13 +6,15 @@ const doc = {
     title: 'Feedback Render',
     description: 'API documentation for a feedback website',
   },
-  host: 'localhost:3000', 
+  host: 'localhost:3000',
   schemes: ['http'],
 };
 
 const outputFile = path.join(__dirname, '../swagger.json');
 
-const endpointsFiles = [path.join(__dirname, '../../main.js')];
+// اضافه کردن همه فایل‌های داخل routes
+const endpointsFiles = [path.join(__dirname, "../routes/v1/*.js")];
+
 
 swaggerAutogen(outputFile, endpointsFiles)
   .then(() => {
