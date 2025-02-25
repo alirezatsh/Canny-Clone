@@ -2,6 +2,7 @@ const Post = require('../models/post');
 const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 const multer = require('multer');
 const path = require('path');
+const post = require('../models/post');
 require("dotenv").config();
 
 // تنظیمات S3 لیارا
@@ -53,4 +54,114 @@ const createPost = async (req, res) => {
     }
 };
 
-module.exports = { createPost, upload };
+
+const GetAllPosts = async(req , res) => {
+    try{
+        const AllPosts = await post.find({})
+        if(AllPosts?.length > 0){
+            res.status(200).json({
+                success : true,
+                message : "list of posts fetched successfully",
+                data:AllPosts
+            })
+        } else{
+            res.status(404).json({
+                success: fals,
+                message : "no post found"
+            })
+        }
+    }catch(e) {
+        console.log(e);
+        res.status(500).json({
+            success : false,
+            message : "something went wrong"
+        })
+    }
+}
+
+const GetSinglePost = async(req , res) => {
+    try{
+        const {id} = req.params
+        const post = await Post.findById(id)
+        if(post){
+            res.status(200).json({
+                success : true,
+                message : "post fetched successfully ",
+                data: post
+            })
+        }else{
+            res.status(404).json({
+                success : false,
+                message : "post not found"
+            })
+        }
+    }catch(e){
+        console.log(e)
+        res.status(500).json({
+            success: false,
+            message : "somethiong went wrong"
+        })
+    }
+}
+
+const UpdatePost = async(req, res) => {
+    try {
+        const { id } = req.params
+        const updatedpost = await Post.findByIdAndUpdate(id, req.body, { new: true, runValidators: true })
+        if(updatedpost){
+            res.status(200).json({
+                success: true,
+                message: 'post updated successfully',
+                data: updatedpost
+            })
+        } else {
+            res.status(404).json({
+                success: false,
+                message: 'post not found'
+            })
+        }
+    } catch(e) {
+        console.log(e)
+        res.status(500).json({
+            success: false,
+            message: 'something went wrong try again'
+        })
+    }
+}
+
+
+const DeletePost = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const post = await Post.findById(id);
+        if (!post) {
+            return res.status(404).json({
+                success: false,
+                message: "post not found"
+            });
+        }
+
+        await post.deleteOne();
+
+        res.status(200).json({
+            success: true,
+            message: "post deleted successfully"
+        });
+
+    } catch (e) {
+        console.log(e);
+        res.status(500).json({
+            success: false,
+            message: "something went wrong"
+        });
+    }
+};
+
+
+
+
+
+
+
+module.exports = { createPost, upload , GetAllPosts , GetSinglePost , DeletePost , UpdatePost };
