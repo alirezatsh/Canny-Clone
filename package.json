@@ -12,8 +12,10 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.750.0",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "mongoose": "^8.10.1",
     "render_feedback": "file:",
     "swagger-autogen": "^2.23.7",
     "swagger-ui-express": "^5.0.1"
