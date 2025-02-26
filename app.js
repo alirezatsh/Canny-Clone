@@ -18,7 +18,7 @@ app.use(errorHandler);
 
 connectToDb()
 
-app.use('/api', PostRoutes , AuthRoutes , );
+app.use('/api', PostRoutes , AuthRoutes );
 
 
 
