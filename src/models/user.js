@@ -1,18 +1,19 @@
-const { Type } = require('@aws-sdk/client-s3')
-const mongoose = require('mongoose')
-
+const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
 
 const UserSchema = new mongoose.Schema({
-    username : {
-        Type : String,
-        required : true,
-        unique : true,
-        trim: true
-    },
-  
+    username: { type: String, required: true, unique: true },
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+}, { timestamps: true });
 
-    
-})
+// hashing the password before save to database
+UserSchema.pre('save', async function(next) {
+    if (!this.isModified('password')) return next();
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+    next();
+});
 
-
-module.exports = mongoose.model('User' , UserSchema)
+const User = mongoose.model('User', UserSchema);
+module.exports = User;

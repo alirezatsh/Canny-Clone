@@ -1,9 +1,11 @@
 const mongoose = require('mongoose');
 
 const PostSchema = new mongoose.Schema({
-    title: { type: String, required: true }, // عنوان پست
-    message: { type: String, required: true }, // متن پست
-    imageUrl: { type: String, required: true }, // لینک عکس ذخیره‌شده در لیارا
+    title: { type: String, required: true }, 
+    message: { type: String, required: true }, 
+    imageUrl: { type: String, required: true }, 
+    likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }], 
+    dislikes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }] 
 }, { timestamps: true });
 
 module.exports = mongoose.model('Post', PostSchema);

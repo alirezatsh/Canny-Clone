@@ -4,7 +4,8 @@ const swaggerUi = require("swagger-ui-express");
 const swaggerFile = require("./src/swagger.json");
 const errorHandler = require('./src/middlewares/errorhandlers');
 const connectToDb = require('./src/config/db')
-const postRoutes = require('./src/routes/v1/post-route')
+const PostRoutes = require('./src/routes/v1/post-route')
+const AuthRoutes = require('./src/routes/v1/auth-route');
 
 
 const app = express()
@@ -17,7 +18,8 @@ app.use(errorHandler);
 
 connectToDb()
 
-app.use('/api', postRoutes);
+app.use('/api', PostRoutes , AuthRoutes , );
+
 
 
 
