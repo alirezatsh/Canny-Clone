@@ -5,7 +5,8 @@ const PostSchema = new mongoose.Schema({
     message: { type: String, required: true }, 
     imageUrl: { type: String, required: true }, 
     likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }], 
-    dislikes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }] 
+    dislikes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }] ,
+    user: [{ type : mongoose.Schema.Types.ObjectId, ref: 'User'}]
 }, { timestamps: true });
 
 module.exports = mongoose.model('Post', PostSchema);

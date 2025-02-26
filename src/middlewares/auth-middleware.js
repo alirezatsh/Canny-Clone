@@ -1,29 +1,27 @@
-const jwt = require('jsonwebtoken')
+const jwt = require("jsonwebtoken");
+const User = require("../models/user");
 
-const AuthMiddleware = (req, res, next) => {
-    const AuthHeader = req.headers['authorization']
-    console.log(AuthHeader);
-    const token = AuthHeader && AuthHeader.split(" ")[1]
-
-    if (!token) {
-        return res.status(401).json({
-            success: false,
-            message: 'access denied. please login first'
-        })
-    }
-
+const AuthMiddleware = async (req, res, next) => {
     try {
-        const DecodeToken = jwt.verify(token, process.env.JWT_SECRET_KEY)
-        console.log(DecodeToken)
+        const authHeader = req.header("Authorization");
+        if (!authHeader || !authHeader.startsWith("Bearer ")) {
+            return res.status(401).json({ message: "No token provided" });
+        }
 
-        req.UserInfo = DecodeToken
-        next()
-    } catch (error) {
-        return res.status(401).json({
-            success: false,
-            message: 'invalid token. please login again'
-        })
+        const token = authHeader.split(" ")[1];
+        const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+
+        const user = await User.findById(decoded.userId);  
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        req.user = user; // مقداردهی req.user
+        next();
+    } catch (err) {
+        res.status(401).json({ message: "Invalid or expired token" });
     }
-}
+};
 
-module.exports = AuthMiddleware
+module.exports = AuthMiddleware;
