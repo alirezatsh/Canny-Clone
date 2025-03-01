@@ -109,40 +109,39 @@ const GetSinglePost = async (req, res) => {
 const UpdatePost = async (req, res) => {
     try {
         const { id } = req.params;
+        console.log("Request Body:", req.body); 
+        console.log("Uploaded File:", req.file); 
 
         const post = await Post.findById(id);
         if (!post) {
-            return res.status(404).json({
-                success: false,
-                message: 'post not found'
-            });
+            return res.status(404).json({ success: false, message: "Post not found" });
         }
 
-        // Check if the user is the owner of the post
-        if (post.user.toString() !== req.user._id.toString()) {
-            return res.status(403).json({
-                success: false,
-                message: "you can not edit this file "
-            });
+        post.title = req.body.title || post.title;
+        post.message = req.body.message || post.message;
+        const imageUrl = await uploadToLiara(req.file);
+
+        
+        if (req.file) {
+            post.imageUrl = `uploads/${imageUrl}`;
         }
 
-        // If the user is the owner, update the post
-        const updatedPost = await Post.findByIdAndUpdate(id, req.body, { new: true, runValidators: true });
+        await post.save();
+
+        console.log("Updated Post:", post);
 
         res.status(200).json({
             success: true,
-            message: 'پست با موفقیت ویرایش شد',
-            data: updatedPost
+            message: "Post updated successfully",
+            data: post
         });
 
     } catch (e) {
         console.log(e);
-        res.status(500).json({
-            success: false,
-            message: 'چیزی اشتباه پیش آمد، لطفاً دوباره تلاش کنید'
-        });
+        res.status(500).json({ success: false, message: "Something went wrong" });
     }
 };
+
 
 // Delete a post
 const DeletePost = async (req, res) => {

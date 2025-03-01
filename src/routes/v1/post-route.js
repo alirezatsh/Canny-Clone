@@ -8,7 +8,7 @@ router.post('/v1/post', AuthMiddleware , upload.single('image'), createPost)
 router.get('/v1/post' , GetAllPosts)
 router.get('/v1/post/:id' , GetSinglePost)
 router.delete('/v1/post/:id', AuthMiddleware  , DeletePost)
-router.put('/v1/post/:id' , AuthMiddleware , UpdatePost)
+router.put('/v1/post/:id' , upload.single('image') , AuthMiddleware , UpdatePost)
 router.post('/v1/post/vote/:id', AuthMiddleware, votePost);
 
 
