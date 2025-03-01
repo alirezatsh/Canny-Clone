@@ -36,7 +36,7 @@ const uploadToLiara = async (file) => {
 // Create a new post and upload the image to Liara
 const createPost = async (req, res) => {
     try {
-        console.log("req.user:", req.user); // مقدار req.user رو لاگ کن
+        console.log("req.user:", req.user); 
 
         const { title, message } = req.body;
         if (!title || !message || !req.file) {
@@ -45,7 +45,7 @@ const createPost = async (req, res) => {
 
         const imageUrl = await uploadToLiara(req.file);
 
-        const newPost = new Post({ title, message, imageUrl, userId: req.user._id });
+        const newPost = new Post({ title, message, imageUrl, user: req.user._id });
         await newPost.save();
 
         res.status(201).json({ message: "post created successfully", post: newPost });

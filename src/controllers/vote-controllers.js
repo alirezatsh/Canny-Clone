@@ -6,7 +6,7 @@ const votePost = async (req, res) => {
         const userId = req.user._id;
 
         const post = await Post.findById(id);
-        if (!post) return res.status(404).json({ success: false, message: "پست پیدا نشد" });
+        if (!post) return res.status(404).json({ success: false, message: "post not found" });
 
         const hasLiked = post.likes.includes(userId);
         const hasDisliked = post.dislikes.includes(userId);
@@ -14,19 +14,20 @@ const votePost = async (req, res) => {
         if (hasLiked) {
             post.likes.pull(userId);
             await post.save();
-            return res.status(200).json({ success: true, message: "لایک حذف شد", status: 0 });
+            return res.status(200).json({ success: true, message: "vote deleted", status: 0 });
         } else if (hasDisliked) {
             post.dislikes.pull(userId);
             post.likes.push(userId);
             await post.save();
-            return res.status(200).json({ success: true, message: "لایک ثبت شد", status: 1 });
+            return res.status(200).json({ success: true, message: "vote registered", status: 1 });
         } else {
             post.likes.push(userId);
             await post.save();
-            return res.status(200).json({ success: true, message: "لایک ثبت شد", status: 1 });
+            return res.status(200).json({ success: true, message: "vote registered", status: 1 });
         }
-    } catch (error) {
-        res.status(500).json({ success: false, message: "خطایی رخ داده است" });
+     } catch (error) {
+        console.error("error", error);
+        res.status(500).json({ success: false, message: "something went wrong", error: error.message });
     }
 };
 
