@@ -4,19 +4,17 @@ const path = require('path');
 const doc = {
   info: {
     title: 'Feedback Render',
-    description: 'API documentation for a feedback website',
+    description: 'API documentation for a feedback website'
   },
   host: 'localhost:3000',
-  schemes: ['http'],
+  schemes: ['http']
 };
 
 const outputFile = path.join(__dirname, '../swagger.json');
 
-// اضافه کردن همه فایل‌های داخل routes
-const endpointsFiles = [path.join(__dirname, "../routes/v1/*.js")];
+const endpointsFiles = [path.join(__dirname, '../routes/v1/*.js')];
 
-
-swaggerAutogen(outputFile, endpointsFiles)
+swaggerAutogen(outputFile, endpointsFiles, doc)
   .then(() => {
     console.log('Swagger documentation has been generated!');
   })
