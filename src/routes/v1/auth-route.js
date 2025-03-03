@@ -1,6 +1,5 @@
 const express = require('express');
-
-const router = express.Router();
+const { validateRegister, validateLogin } = require('../../middlewares/validation');
 const {
   LoginUser,
   RegisterUser,
@@ -8,8 +7,10 @@ const {
   ResetPassword
 } = require('../../controllers/auth-controllers');
 
-router.post('/api/v1/register', RegisterUser);
-router.post('/api/v1/login', LoginUser);
+const router = express.Router();
+
+router.post('/api/v1/register', validateRegister, RegisterUser);
+router.post('/api/v1/login', validateLogin, LoginUser);
 router.post('/api/v1/forgot-password', ForgotPassword);
 router.post('/api/v1/reset-password/:token', ResetPassword);
 

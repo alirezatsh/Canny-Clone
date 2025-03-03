@@ -19,13 +19,16 @@
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "globals": "^16.0.0",
+    "joi": "^17.13.3",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.10.1",
     "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.10.0",
     "render_feedback": "file:",
     "swagger-autogen": "^2.23.7",
-    "swagger-ui-express": "^5.0.1"
+    "swagger-ui-express": "^5.0.1",
+    "winston": "^3.17.0",
+    "winston-daily-rotate-file": "^5.0.0"
   },
   "devDependencies": {
     "eslint": "^8.40.0",
