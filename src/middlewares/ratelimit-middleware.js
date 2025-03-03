@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-extraneous-dependencies
 const ratelimit = require('express-rate-limit');
 
 const basiclimit = (maxRequest, time) => {

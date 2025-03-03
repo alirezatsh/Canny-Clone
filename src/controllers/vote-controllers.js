@@ -1,17 +1,18 @@
 const Post = require('../models/post');
+const AppError = require('../config/app-errors');
 
-const votePost = async (req, res) => {
+const votePost = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const userId = req.user && req.user._id; // بررسی وجود _id در req.user
+    const userId = req.user && req.user._id;
 
     if (!userId) {
-      return res.status(400).json({ success: false, message: 'User not authenticated' });
+      return next(new AppError('User not authenticated', 401));
     }
 
     const post = await Post.findById(id);
     if (!post) {
-      return res.status(404).json({ success: false, message: 'Post not found' });
+      return next(new AppError('Post not found', 404));
     }
 
     const hasLiked = post.likes.includes(userId);
@@ -36,10 +37,7 @@ const votePost = async (req, res) => {
     await post.save();
     return res.status(200).json({ success: true, message: 'Vote registered', status: 1 });
   } catch (error) {
-    console.error('Error:', error);
-    return res
-      .status(500)
-      .json({ success: false, message: 'Something went wrong', error: error.message });
+    return next(new AppError('Something went wrong', 500));
   }
 };
 

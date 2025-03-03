@@ -2,6 +2,7 @@ const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
 const multer = require('multer');
 require('dotenv').config();
 const Post = require('../models/post');
+const AppError = require('../config/app-errors');
 
 // S3 Client Configuration
 const s3 = new S3Client({
@@ -31,12 +32,12 @@ const uploadToLiara = async (file) => {
   return `${process.env.LIARA_ENDPOINT}/${process.env.LIARA_BUCKET_NAME}/${fileName}`;
 };
 
-// Create a new post and upload the image to Liara
-const createPost = async (req, res) => {
+// Create a new post
+const createPost = async (req, res, next) => {
   try {
     const { title, message } = req.body;
     if (!title || !message || !req.file) {
-      return res.status(400).json({ error: 'please fill all the fields' });
+      return next(new AppError('Please fill all the fields', 400));
     }
 
     const imageUrl = await uploadToLiara(req.file);
@@ -49,70 +50,49 @@ const createPost = async (req, res) => {
     });
     await newPost.save();
 
-    return res.status(201).json({ message: 'post created successfully', post: newPost });
+    return res.status(201).json({ message: 'Post created successfully', post: newPost });
   } catch (error) {
-    return res
-      .status(500)
-      .json({ error: 'something went wrong', details: error.message });
+    return next(new AppError('Something went wrong', 500));
   }
 };
 
-// Get all available posts
-const GetAllPosts = async (req, res) => {
+// Get all posts
+const GetAllPosts = async (req, res, next) => {
   try {
     const allPosts = await Post.find({});
     if (allPosts.length > 0) {
       return res.status(200).json({
         success: true,
-        message: 'list of posts fetched successfully',
+        message: 'List of posts fetched successfully',
         data: allPosts
       });
     }
-    return res.status(404).json({
-      success: false,
-      message: 'no post found'
-    });
+    return next(new AppError('No post found', 404));
   } catch (e) {
-    return res.status(500).json({
-      success: false,
-      message: 'something went wrong'
-    });
+    return next(new AppError('Something went wrong', 500));
   }
 };
 
-// Get a single post by id
-const GetSinglePost = async (req, res) => {
+// Get a single post
+const GetSinglePost = async (req, res, next) => {
   try {
     const { id } = req.params;
     const post = await Post.findById(id);
-    if (post) {
-      return res.status(200).json({
-        success: true,
-        message: 'post fetched successfully',
-        data: post
-      });
-    }
-    return res.status(404).json({
-      success: false,
-      message: 'post not found'
-    });
+    if (!post) return next(new AppError('Post not found', 404));
+    return res
+      .status(200)
+      .json({ success: true, message: 'Post fetched successfully', data: post });
   } catch (e) {
-    return res.status(500).json({
-      success: false,
-      message: 'something went wrong'
-    });
+    return next(new AppError('Something went wrong', 500));
   }
 };
 
 // Update a post
-const UpdatePost = async (req, res) => {
+const UpdatePost = async (req, res, next) => {
   try {
     const { id } = req.params;
-
     const post = await Post.findById(id);
-    if (!post) {
-      return res.status(404).json({ success: false, message: 'Post not found' });
-    }
+    if (!post) return next(new AppError('Post not found', 404));
 
     post.title = req.body.title || post.title;
     post.message = req.body.message || post.message;
@@ -120,56 +100,33 @@ const UpdatePost = async (req, res) => {
       const imageUrl = await uploadToLiara(req.file);
       post.imageUrl = imageUrl;
     }
-
     await post.save();
 
-    return res.status(200).json({
-      success: true,
-      message: 'Post updated successfully',
-      data: post
-    });
+    return res
+      .status(200)
+      .json({ success: true, message: 'Post updated successfully', data: post });
   } catch (e) {
-    return res.status(500).json({ success: false, message: 'Something went wrong' });
+    return next(new AppError('Something went wrong', 500));
   }
 };
 
 // Delete a post
-const DeletePost = async (req, res) => {
+const DeletePost = async (req, res, next) => {
   try {
     const { id } = req.params;
-
-    if (!req.user || !req.user._id) {
-      return res.status(403).json({
-        success: false,
-        message: 'Unauthorized'
-      });
-    }
+    if (!req.user || !req.user._id) return next(new AppError('Unauthorized', 403));
 
     const post = await Post.findById(id);
-    if (!post) {
-      return res.status(404).json({
-        success: false,
-        message: 'Post not found'
-      });
-    }
+    if (!post) return next(new AppError('Post not found', 404));
 
     if (post.user.toString() !== req.user._id.toString()) {
-      return res.status(403).json({
-        success: false,
-        message: 'You do not have permission to delete this post'
-      });
+      return next(new AppError('You do not have permission to delete this post', 403));
     }
 
     await post.deleteOne();
-    return res.status(200).json({
-      success: true,
-      message: 'Post deleted successfully'
-    });
+    return res.status(200).json({ success: true, message: 'Post deleted successfully' });
   } catch (e) {
-    return res.status(500).json({
-      success: false,
-      message: 'Something went wrong'
-    });
+    return next(new AppError('Something went wrong', 500));
   }
 };
 

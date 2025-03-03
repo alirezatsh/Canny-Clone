@@ -23,7 +23,12 @@ const ForgotPassword = async (req, res, next) => {
 
     user.resetPasswordToken = resetToken;
     user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
-    await user.save();
+    try {
+      await user.save();
+      console.log(' User token saved in DB:', user.resetPasswordToken);
+    } catch (dbError) {
+      console.error(' Error saving user token:', dbError);
+    }
 
     const transporter = nodemailer.createTransport({
       host: process.env.MAIL_HOST,
@@ -66,9 +71,9 @@ const ForgotPassword = async (req, res, next) => {
 const ResetPassword = async (req, res, next) => {
   try {
     const { token } = req.params;
-    const { newPassword } = req.body;
+    const { password } = req.body;
 
-    if (!newPassword) {
+    if (!password) {
       return next(new AppError('New password is required', 400));
     }
 
@@ -82,7 +87,8 @@ const ResetPassword = async (req, res, next) => {
     }
 
     const salt = await bcrypt.genSalt(10);
-    user.password = await bcrypt.hash(newPassword, salt);
+    user.password = await bcrypt.hash(password, salt);
+    console.log('New hashed password:', user.password);
 
     user.resetPasswordToken = null;
     user.resetPasswordExpires = null;
