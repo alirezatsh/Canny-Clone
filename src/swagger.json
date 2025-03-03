@@ -1,9 +1,9 @@
 {
   "swagger": "2.0",
   "info": {
-    "version": "1.0.0",
-    "title": "REST API",
-    "description": ""
+    "title": "Feedback Render",
+    "description": "API documentation for a feedback website",
+    "version": "1.0.0"
   },
   "host": "localhost:3000",
   "basePath": "/",
@@ -11,7 +11,7 @@
     "http"
   ],
   "paths": {
-    "/v1/register": {
+    "/api/v1/register": {
       "post": {
         "description": "",
         "parameters": [
@@ -47,7 +47,7 @@
         }
       }
     },
-    "/v1/login": {
+    "/api/v1/login": {
       "post": {
         "description": "",
         "parameters": [
@@ -80,7 +80,7 @@
         }
       }
     },
-    "/v1/forgot-password": {
+    "/api/v1/forgot-password": {
       "post": {
         "description": "",
         "parameters": [
@@ -110,7 +110,7 @@
         }
       }
     },
-    "/v1/reset-password/{token}": {
+    "/api/v1/reset-password/{token}": {
       "post": {
         "description": "",
         "parameters": [
@@ -146,7 +146,7 @@
         }
       }
     },
-    "/v1/post": {
+    "/api/v1/post": {
       "post": {
         "description": "",
         "parameters": [
@@ -204,7 +204,7 @@
         }
       }
     },
-    "/v1/post/{id}": {
+    "/api/v1/post/{id}": {
       "get": {
         "description": "",
         "parameters": [
@@ -273,17 +273,32 @@
             "name": "Authorization",
             "in": "header",
             "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "example": "any"
+                },
+                "message": {
+                  "example": "any"
+                }
+              }
+            }
           }
         ],
         "responses": {
           "200": {
             "description": "OK"
           },
+          "400": {
+            "description": "Bad Request"
+          },
           "401": {
             "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
           },
           "404": {
             "description": "Not Found"
@@ -294,7 +309,7 @@
         }
       }
     },
-    "/v1/post/vote/{id}": {
+    "/api/v1/post/vote/{id}": {
       "post": {
         "description": "",
         "parameters": [
@@ -313,6 +328,9 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
           },
           "401": {
             "description": "Unauthorized"
