@@ -1,5 +1,6 @@
 const Joi = require('joi');
 const authValidation = require('./user-middleware');
+const postValidation = require('./post-middleware');
 
 const validate = (schema) => {
   return (req, res, next) => {
@@ -13,5 +14,8 @@ const validate = (schema) => {
   };
 };
 
-exports.validateRegister = validate(Joi.object(authValidation));
-exports.validateLogin = validate(Joi.object(authValidation));
+const validateRegister = validate(Joi.object(authValidation));
+const validateLogin = validate(Joi.object(authValidation));
+const validatePost = validate(postValidation);
+
+module.exports = { validateRegister, validateLogin, validatePost };

@@ -1,4 +1,5 @@
 const express = require('express');
+const { validatePost } = require('../../middlewares/validation');
 
 const router = express.Router();
 const {
@@ -12,11 +13,23 @@ const {
 const { votePost } = require('../../controllers/vote-controllers');
 const AuthMiddleware = require('../../middlewares/auth-middleware');
 
-router.post('/api/v1/post', AuthMiddleware, upload.single('image'), createPost);
+router.post(
+  '/api/v1/post',
+  upload.single('image'),
+  AuthMiddleware,
+  validatePost,
+  createPost
+);
 router.get('/api/v1/post', GetAllPosts);
 router.get('/api/v1/post/:id', GetSinglePost);
 router.delete('/api/v1/post/:id', AuthMiddleware, DeletePost);
-router.put('/api/v1/post/:id', upload.single('image'), AuthMiddleware, UpdatePost);
+router.put(
+  '/api/v1/post/:id',
+  AuthMiddleware,
+  upload.single('image'),
+  validatePost,
+  UpdatePost
+);
 router.post('/api/v1/post/vote/:id', AuthMiddleware, votePost);
 
 module.exports = router;

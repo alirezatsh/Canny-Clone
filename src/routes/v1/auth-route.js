@@ -1,5 +1,5 @@
 const express = require('express');
-const { validateRegister, validateLogin } = require('../../middlewares/validation');
+const { validateRegister } = require('../../middlewares/validation');
 const {
   LoginUser,
   RegisterUser,
@@ -10,7 +10,7 @@ const {
 const router = express.Router();
 
 router.post('/api/v1/register', validateRegister, RegisterUser);
-router.post('/api/v1/login', validateLogin, LoginUser);
+router.post('/api/v1/login', LoginUser);
 router.post('/api/v1/forgot-password', ForgotPassword);
 router.post('/api/v1/reset-password/:token', ResetPassword);
 
