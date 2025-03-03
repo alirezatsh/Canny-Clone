@@ -1,7 +1,5 @@
 const express = require('express');
 const { validatePost } = require('../../middlewares/validation');
-
-const router = express.Router();
 const {
   createPost,
   upload,
@@ -12,6 +10,8 @@ const {
 } = require('../../controllers/post-controllers');
 const { votePost } = require('../../controllers/vote-controllers');
 const AuthMiddleware = require('../../middlewares/auth-middleware');
+
+const router = express.Router();
 
 router.post(
   '/api/v1/post',

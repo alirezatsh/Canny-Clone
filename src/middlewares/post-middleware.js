@@ -1,5 +1,6 @@
 const Joi = require('joi');
 
+// validation for a post (title , message)
 const postValidation = Joi.object({
   title: Joi.string().min(5).max(100).required().messages({
     'string.base': 'Title must be a string',

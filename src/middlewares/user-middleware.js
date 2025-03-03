@@ -1,5 +1,6 @@
 const Joi = require('joi');
 
+// validation for user registration
 const authValidation = {
   username: Joi.string().min(3).max(20).required().messages({
     'string.base': 'Username must be a string',

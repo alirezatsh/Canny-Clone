@@ -12,6 +12,7 @@ const { basiclimit } = require('./src/middlewares/ratelimit-middleware');
 const app = express();
 const port = process.env.PORT || 3000;
 
+// log for info level messages
 app.use((req, res, next) => {
   res.on('finish', () => {
     if (res.statusCode >= 400) {
@@ -26,14 +27,8 @@ app.use((req, res, next) => {
   });
   next();
 });
-app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerFile));
-app.use(express.json());
-app.use(basiclimit(100, 60 * 15 * 1000));
 
-ConnectToDb();
-
-app.use('/', PostRoutes, AuthRoutes);
-
+// log for error level messages
 app.use((err, req, res, next) => {
   logger.error(
     `${err.statusCode} ${req.method} ${req.originalUrl} ${err.message} - ${err.stack}`
@@ -42,6 +37,13 @@ app.use((err, req, res, next) => {
 });
 
 app.use(errorHandler);
+app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerFile));
+app.use(express.json());
+app.use(basiclimit(100, 60 * 15 * 1000));
+
+ConnectToDb();
+
+app.use('/', PostRoutes, AuthRoutes); // main url
 
 app.listen(port, () => {
   console.log('app is running on port ', port);

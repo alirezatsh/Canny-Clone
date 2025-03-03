@@ -14,6 +14,7 @@ const outputFile = path.join(__dirname, '../swagger.json');
 
 const endpointsFiles = [path.join(__dirname, '../routes/v1/*.js')];
 
+// set the swagger autogenerator
 swaggerAutogen(outputFile, endpointsFiles, doc)
   .then(() => {
     console.log('Swagger documentation has been generated!');

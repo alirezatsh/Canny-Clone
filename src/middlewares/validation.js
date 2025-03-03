@@ -15,7 +15,6 @@ const validate = (schema) => {
 };
 
 const validateRegister = validate(Joi.object(authValidation));
-const validateLogin = validate(Joi.object(authValidation));
 const validatePost = validate(postValidation);
 
-module.exports = { validateRegister, validateLogin, validatePost };
+module.exports = { validateRegister, validatePost };

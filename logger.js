@@ -14,6 +14,7 @@ const transportInfo = new winston.transports.DailyRotateFile({
   maxFiles: '14d',
   level: 'info'
 });
+
 const transportError = new winston.transports.DailyRotateFile({
   filename: './src/logs/errors-%DATE%.log',
   datePattern: 'YYYY-MM-DD-HH',
@@ -21,6 +22,8 @@ const transportError = new winston.transports.DailyRotateFile({
   maxFiles: '21d',
   level: 'error'
 });
+
+// set the state of developing from env file
 const transports = [];
 if (process.env.NODE_ENV === 'development') {
   const devTransport = new winston.transports.Console({
