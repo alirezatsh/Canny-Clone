@@ -2,15 +2,13 @@ require('dotenv').config();
 const express = require('express');
 const swaggerUi = require('swagger-ui-express');
 const swaggerFile = require('./src/swagger.json');
-const ConnectToDb = require('./src/config/db');
 const PostRoutes = require('./src/routes/v1/post-route');
 const AuthRoutes = require('./src/routes/v1/auth-route');
 const logger = require('./logger');
-const errorHandler = require('./src/middlewares/error-handler-middleware');
 const { basiclimit } = require('./src/middlewares/ratelimit-middleware');
+const errorHandler = require('./src/middlewares/error-handler-middleware');
 
 const app = express();
-const port = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -42,14 +40,7 @@ app.use((err, req, res, next) => {
 app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerFile));
 app.use(basiclimit(100, 60 * 15 * 1000));
 
-ConnectToDb();
-
 app.use('/', PostRoutes, AuthRoutes); // main url
-
 app.use(errorHandler);
 
-app.listen(port, () => {
-  console.log('app is running on port ', port);
-});
-
-module.exports = { app };
+module.exports = app;
