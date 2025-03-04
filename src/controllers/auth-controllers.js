@@ -86,9 +86,7 @@ const ResetPassword = async (req, res, next) => {
       return next(new AppError('Invalid or expired token', 400));
     }
 
-    const salt = await bcrypt.genSalt(10);
-    user.password = await bcrypt.hash(password, salt);
-    console.log('New hashed password:', user.password);
+    user.password = password;
 
     user.resetPasswordToken = null;
     user.resetPasswordExpires = null;
@@ -142,6 +140,8 @@ const LoginUser = async (req, res, next) => {
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
+    console.log('Password match:', isMatch);
+
     if (!isMatch) {
       return next(new AppError('Incorrect password', 400));
     }

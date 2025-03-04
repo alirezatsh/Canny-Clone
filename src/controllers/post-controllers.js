@@ -94,6 +94,10 @@ const UpdatePost = async (req, res, next) => {
     const post = await Post.findById(id);
     if (!post) return next(new AppError('Post not found', 404));
 
+    if (post.user.toString() !== req.user._id.toString()) {
+      return next(new AppError('You do not have permission to update this post', 403));
+    }
+
     post.title = req.body.title || post.title;
     post.message = req.body.message || post.message;
     if (req.file) {

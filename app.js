@@ -12,6 +12,9 @@ const { basiclimit } = require('./src/middlewares/ratelimit-middleware');
 const app = express();
 const port = process.env.PORT || 3000;
 
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 // log for info level messages
 app.use((req, res, next) => {
   res.on('finish', () => {
@@ -36,14 +39,14 @@ app.use((err, req, res, next) => {
   next(err);
 });
 
-app.use(errorHandler);
 app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerFile));
-app.use(express.json());
 app.use(basiclimit(100, 60 * 15 * 1000));
 
 ConnectToDb();
 
 app.use('/', PostRoutes, AuthRoutes); // main url
+
+app.use(errorHandler);
 
 app.listen(port, () => {
   console.log('app is running on port ', port);
