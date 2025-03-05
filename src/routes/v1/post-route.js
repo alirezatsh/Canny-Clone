@@ -15,8 +15,8 @@ const router = express.Router();
 
 router.post(
   '/api/v1/post',
-  upload.single('image'),
   AuthMiddleware,
+  upload.single('image'),
   validatePost,
   createPost
 );

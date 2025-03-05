@@ -1,11 +1,11 @@
-// eslint-disable-next-line import/no-extraneous-dependencies
 const ratelimit = require('express-rate-limit');
+const AppError = require('../config/app-errors');
 
 const basiclimit = (maxRequest, time) => {
   return ratelimit({
     max: maxRequest,
     windowMs: time,
-    message: 'too many request , please try agian later',
+    message: new AppError('Too many requests, please try again later', 429),
     standardHeaders: true,
     legacyHeaders: false
   });

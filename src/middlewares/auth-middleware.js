@@ -1,26 +1,32 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
+const AppError = require('../config/app-errors');
 
+// eslint-disable-next-line consistent-return
 const AuthMiddleware = async (req, res, next) => {
   try {
     const authHeader = req.header('Authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({ message: 'No token provided' });
+      return next(new AppError('No token provided', 401));
     }
 
     const token = authHeader.split(' ')[1];
-    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+    let decoded;
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+    } catch (err) {
+      return next(new AppError('Invalid or expired token', 401));
+    }
 
     const user = await User.findById(decoded.userId);
-
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return next(new AppError('User not found', 404));
     }
 
     req.user = user;
-    return next();
+    next();
   } catch (err) {
-    return res.status(401).json({ message: 'Invalid or expired token' });
+    return next(new AppError('Something went wrong with authentication', 500));
   }
 };
 

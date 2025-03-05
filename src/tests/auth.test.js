@@ -1,4 +1,6 @@
+/* eslint-disable node/no-unpublished-require */
 /* eslint-disable no-undef */
+// eslint-disable-next-line import/no-extraneous-dependencies
 const request = require('supertest');
 const app = require('../../app');
 // eslint-disable-next-line import/order

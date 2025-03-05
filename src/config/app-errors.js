@@ -7,7 +7,7 @@ class AppError extends Error {
     } else {
       this.status = 'error';
     }
-    this.isOperational = true;
+    this.isOperational = true; // checks that the error is a programming error
     Error.captureStackTrace(this, this.constructor);
   }
 }
