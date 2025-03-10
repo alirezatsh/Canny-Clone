@@ -17,13 +17,13 @@ const votePost = async (req, res, next) => {
 
     const hasLiked = post.likes.includes(userId);
     const hasDisliked = post.dislikes.includes(userId);
-
+    // delete the like if user has already liked
     if (hasLiked) {
       post.likes.pull(userId);
       await post.save();
       return res.status(200).json({ success: true, message: 'Vote deleted', status: 0 });
     }
-
+    // if user hasdisliked , delete from dislikes array and add to like array
     if (hasDisliked) {
       post.dislikes.pull(userId);
       post.likes.push(userId);
@@ -32,7 +32,7 @@ const votePost = async (req, res, next) => {
         .status(200)
         .json({ success: true, message: 'Vote registered', status: 1 });
     }
-
+    // if none , add new like to likes array
     post.likes.push(userId);
     await post.save();
     return res.status(200).json({ success: true, message: 'Vote registered', status: 1 });
