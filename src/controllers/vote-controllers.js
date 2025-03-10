@@ -1,4 +1,5 @@
 const Post = require('../models/post');
+const Vote = require('../models/vote');
 const AppError = require('../config/app-errors');
 
 const votePost = async (req, res, next) => {
@@ -15,28 +16,22 @@ const votePost = async (req, res, next) => {
       return next(new AppError('Post not found', 404));
     }
 
-    const hasLiked = post.likes.includes(userId);
-    const hasDisliked = post.dislikes.includes(userId);
-    // delete the like if user has already liked
-    if (hasLiked) {
-      post.likes.pull(userId);
-      await post.save();
-      return res.status(200).json({ success: true, message: 'Vote deleted', status: 0 });
+    // Check if the user has already voted on this post
+    const existingVote = await Vote.findOne({ post: id, user: userId });
+
+    if (existingVote) {
+      // If the vote exists, remove it
+      await Vote.deleteOne({ _id: existingVote._id });
+      return res.status(200).json({ success: true, message: 'Vote removed', status: 0 });
     }
-    // if user hasdisliked , delete from dislikes array and add to like array
-    if (hasDisliked) {
-      post.dislikes.pull(userId);
-      post.likes.push(userId);
-      await post.save();
-      return res
-        .status(200)
-        .json({ success: true, message: 'Vote registered', status: 1 });
-    }
-    // if none , add new like to likes array
-    post.likes.push(userId);
-    await post.save();
+
+    // If no vote exists, register a new vote
+    const newVote = new Vote({ post: id, user: userId, voteType: 'vote' });
+    await newVote.save();
+
     return res.status(200).json({ success: true, message: 'Vote registered', status: 1 });
   } catch (error) {
+    console.error('Vote Error:', error);
     return next(new AppError('Something went wrong', 500));
   }
 };
