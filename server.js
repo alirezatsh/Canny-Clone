@@ -1,8 +1,11 @@
 const connectToDb = require('./src/config/db');
 const app = require('./app');
 
-connectToDb();
+const startServer = async () => {
+  await connectToDb();
+  app.listen(process.env.PORT, () => {
+    console.log(`App is running on port ${process.env.PORT}`);
+  });
+};
 
-app.listen(process.env.PORT, () => {
-  console.log('app is running.');
-});
+startServer();
