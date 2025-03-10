@@ -5,7 +5,35 @@ const crypto = require('crypto');
 const User = require('../models/user');
 const AppError = require('../config/app-errors');
 
+// Helper function to create the transporter for sending emails
+const createEmailTransporter = () => {
+  return nodemailer.createTransport({
+    host: process.env.MAIL_HOST,
+    port: process.env.MAIL_PORT,
+    secure: true, // True for 465, false for other ports
+    auth: {
+      user: process.env.MAIL_USER,
+      pass: process.env.MAIL_PASSWORD
+    }
+  });
+};
+
+// Helper function to send the email
+const sendEmail = async (emailOptions) => {
+  const transporter = createEmailTransporter();
+
+  try {
+    const info = await transporter.sendMail(emailOptions);
+    console.log('Email sent: ', info.response);
+    return true;
+  } catch (error) {
+    console.error('Email sending error:', error);
+    throw new Error('Failed to send email');
+  }
+};
+
 // Forgot Password
+// eslint-disable-next-line consistent-return
 const ForgotPassword = async (req, res, next) => {
   try {
     const { email } = req.body;
@@ -20,28 +48,18 @@ const ForgotPassword = async (req, res, next) => {
     }
 
     const resetToken = crypto.randomBytes(32).toString('hex');
-
     user.resetPasswordToken = resetToken;
     user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+
     try {
       await user.save();
-      console.log(' User token saved in DB:', user.resetPasswordToken);
+      console.log('User token saved in DB:', user.resetPasswordToken);
     } catch (dbError) {
-      console.error(' Error saving user token:', dbError);
+      console.error('Error saving user token:', dbError);
+      return next(new AppError('Database error', 500));
     }
 
-    const transporter = nodemailer.createTransport({
-      host: process.env.MAIL_HOST,
-      port: process.env.MAIL_PORT,
-      secure: true,
-      auth: {
-        user: process.env.MAIL_USER,
-        pass: process.env.MAIL_PASSWORD
-      }
-    });
-
     const resetURL = `http://localhost:3000/reset-password/${resetToken}`;
-
     const mailOptions = {
       from: `"My App" <${process.env.MAIL_FROM}>`,
       to: user.email,
@@ -51,15 +69,12 @@ const ForgotPassword = async (req, res, next) => {
              <p>If you did not request this, please ignore this email.</p>`
     };
 
-    try {
-      const info = await transporter.sendMail(mailOptions);
-      console.log('Email sent: ', info.response);
+    // Send email using helper function
+    const emailSent = await sendEmail(mailOptions);
+    if (emailSent) {
       return res
         .status(200)
         .json({ success: true, message: 'Reset link sent to your email' });
-    } catch (emailError) {
-      console.error('Email sending error:', emailError);
-      return next(new AppError('Failed to send email', 500));
     }
   } catch (error) {
     console.error('ForgotPassword error:', error);
@@ -87,9 +102,9 @@ const ResetPassword = async (req, res, next) => {
     }
 
     user.password = password;
-
     user.resetPasswordToken = null;
     user.resetPasswordExpires = null;
+
     await user.save();
 
     return res.status(200).json({ success: true, message: 'Password reset successful' });
@@ -140,8 +155,6 @@ const LoginUser = async (req, res, next) => {
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
-    console.log('Password match:', isMatch);
-
     if (!isMatch) {
       return next(new AppError('Incorrect password', 400));
     }
