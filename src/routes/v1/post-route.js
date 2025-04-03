@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-extraneous-dependencies
 const express = require('express');
 const { validatePost } = require('../../middlewares/validation');
 const {
@@ -11,7 +12,7 @@ const {
 const { votePost } = require('../../controllers/vote-controllers');
 const AuthMiddleware = require('../../middlewares/auth-middleware');
 
-const router = express.Router();
+const router = express();
 
 router.post(
   '/api/v1/post',
