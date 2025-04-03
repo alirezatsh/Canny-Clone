@@ -25,16 +25,12 @@ jobs:
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          password: ${{ secrets.SSH_PASSWORD }} 
           port: 22
           script: |
             cd /home/alireza/Canny-Clone
-            git fetch origin master
-            git reset --hard origin/master
             git pull origin master
             npm install
             npm run build
             pm2 restart all
-
-
 
